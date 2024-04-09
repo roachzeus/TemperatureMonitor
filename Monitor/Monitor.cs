@@ -4,24 +4,13 @@ namespace TemperatureMonitor.Monitor
 {
     public class Monitor
     {
-        private bool shoudRun = true;
-        private Dictionary<String, float> valueData;
+        //private bool shoudRun = true;
+        //private Dictionary<String, float> valueData;
+        private UpdateVisitor visitor;
         public Monitor()
         {
-            this.valueData = new Dictionary<String, float>();
-        }
-
-        public void doWork()
-        {
-            while (shoudRun)
-            {
-
-            }
-        }
-
-        public void stopWork()
-        {
-            shoudRun = false;
+            //this.valueData = new Dictionary<String, float>();
+            visitor = new UpdateVisitor();
         }
 
         public Dictionary<String, float> updateSensors(bool includeMobo)
@@ -38,7 +27,7 @@ namespace TemperatureMonitor.Monitor
             };
 
             computer.Open();
-            computer.Accept(new UpdateVisitor());
+            computer.Accept(visitor);
             Dictionary<String, float> values = new Dictionary<String, float>();
             foreach (IHardware hardware in computer.Hardware)
             {

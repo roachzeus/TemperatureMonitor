@@ -7,12 +7,17 @@ namespace TemperatureMonitor
         private List<String> polledItems;
         private Thread? workerThread;
         private bool shouldMonitorRun = true;
+        private OtherUI otherUI;
 
         public MainUI()
         {
             monitor = new Monitor.Monitor();
             cCal = new ColorCalculator();
             polledItems = new List<String>() { "", "", "", "" };
+            otherUI = new OtherUI(this);
+            otherUI.Hide();
+
+            //otherUI.Visible = false;
             InitializeComponent();
             initSensorsList();
         }
@@ -26,7 +31,7 @@ namespace TemperatureMonitor
             listBox3.Items.Clear();
             listBox4.Items.Clear();
 
-            foreach(KeyValuePair<String, float> pair in data)
+            foreach (KeyValuePair<String, float> pair in data)
             {
                 listBox1.Items.Add(pair.Key);
                 listBox2.Items.Add(pair.Key);
@@ -42,12 +47,14 @@ namespace TemperatureMonitor
             }
 
             shouldMonitorRun = true;
-            this.workerThread = new Thread(() => {
+            this.workerThread = new Thread(() =>
+            {
 
                 while (shouldMonitorRun)
                 {
                     Dictionary<String, float> map = monitor.updateSensors(true);
-                    BeginInvoke(() => {
+                    BeginInvoke(() =>
+                    {
 
                         // TODO this if spagethi looks awful, fix it.
                         if (map.ContainsKey(polledItems[0]))
@@ -144,7 +151,7 @@ namespace TemperatureMonitor
         }
         private void addToPolledItems(ListBox lbox, int index)
         {
-            if (lbox == null) { return; }
+            if (lbox == null || lbox.SelectedItem == null) { return; }
             this.polledItems[index] = lbox.SelectedItem.ToString();
         }
         private void mainUI_Resize(object sender, EventArgs e)
@@ -156,8 +163,8 @@ namespace TemperatureMonitor
             if (newWidth > 800)
             {
                 size = 40;
-            } 
-            else if(newWidth > 700)
+            }
+            else if (newWidth > 700)
             {
                 size = 36;
             }
@@ -178,6 +185,23 @@ namespace TemperatureMonitor
             lblVal2.Font = new Font("Segoe UI", size, FontStyle.Bold);
             lblVal3.Font = new Font("Segoe UI", size, FontStyle.Bold);
             lblVal4.Font = new Font("Segoe UI", size, FontStyle.Bold);
+        }
+
+        private void btnOtherUI_Click(object sender, EventArgs e)
+        {
+            
+            if(otherUI == null || otherUI.IsDisposed)
+            {
+                otherUI = new OtherUI(this);
+                otherUI.Show();
+            }
+            else if (!otherUI.Visible)
+            {
+                otherUI.Show();
+            } else
+            {
+                otherUI.Hide();
+            }
         }
     }
 }

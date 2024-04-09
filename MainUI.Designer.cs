@@ -43,6 +43,7 @@ namespace TemperatureMonitor
             lblVal4 = new Label();
             listBox1 = new ListBox();
             btnStartStop = new Button();
+            btnOtherUI = new Button();
             mainTable.SuspendLayout();
             SuspendLayout();
             // 
@@ -67,13 +68,14 @@ namespace TemperatureMonitor
             mainTable.Controls.Add(lblVal4, 3, 1);
             mainTable.Controls.Add(listBox1, 0, 2);
             mainTable.Controls.Add(btnStartStop, 0, 3);
+            mainTable.Controls.Add(btnOtherUI, 3, 3);
             mainTable.Location = new Point(20, 20);
             mainTable.Margin = new Padding(10);
             mainTable.Name = "mainTable";
             mainTable.RowCount = 4;
             mainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            mainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 30F));
-            mainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
+            mainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            mainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             mainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
             mainTable.Size = new Size(384, 421);
             mainTable.TabIndex = 0;
@@ -88,10 +90,10 @@ namespace TemperatureMonitor
             listBox4.FormattingEnabled = true;
             listBox4.ItemHeight = 17;
             listBox4.Items.AddRange(new object[] { "asd", "qwe", "zxc", "rty", "fgh", "vbn" });
-            listBox4.Location = new Point(293, 215);
+            listBox4.Location = new Point(293, 173);
             listBox4.Margin = new Padding(5);
             listBox4.Name = "listBox4";
-            listBox4.Size = new Size(86, 155);
+            listBox4.Size = new Size(86, 189);
             listBox4.TabIndex = 12;
             listBox4.SelectedIndexChanged += listBox4_SelectedIndexChanged;
             // 
@@ -105,10 +107,10 @@ namespace TemperatureMonitor
             listBox3.FormattingEnabled = true;
             listBox3.ItemHeight = 17;
             listBox3.Items.AddRange(new object[] { "asd", "qwe", "zxc", "rty", "fgh", "vbn" });
-            listBox3.Location = new Point(197, 215);
+            listBox3.Location = new Point(197, 173);
             listBox3.Margin = new Padding(5);
             listBox3.Name = "listBox3";
-            listBox3.Size = new Size(86, 155);
+            listBox3.Size = new Size(86, 189);
             listBox3.TabIndex = 11;
             listBox3.SelectedIndexChanged += listBox3_SelectedIndexChanged;
             // 
@@ -122,10 +124,10 @@ namespace TemperatureMonitor
             listBox2.FormattingEnabled = true;
             listBox2.ItemHeight = 17;
             listBox2.Items.AddRange(new object[] { "asd", "qwe", "zxc", "rty", "fgh", "vbn" });
-            listBox2.Location = new Point(101, 215);
+            listBox2.Location = new Point(101, 173);
             listBox2.Margin = new Padding(5);
             listBox2.Name = "listBox2";
-            listBox2.Size = new Size(86, 155);
+            listBox2.Size = new Size(86, 189);
             listBox2.TabIndex = 10;
             listBox2.SelectedIndexChanged += listBox2_SelectedIndexChanged;
             // 
@@ -194,7 +196,7 @@ namespace TemperatureMonitor
             lblVal1.Location = new Point(5, 89);
             lblVal1.Margin = new Padding(5);
             lblVal1.Name = "lblVal1";
-            lblVal1.Size = new Size(86, 116);
+            lblVal1.Size = new Size(86, 74);
             lblVal1.TabIndex = 4;
             lblVal1.Text = "99,9";
             lblVal1.TextAlign = ContentAlignment.MiddleCenter;
@@ -208,7 +210,7 @@ namespace TemperatureMonitor
             lblVal2.Location = new Point(101, 89);
             lblVal2.Margin = new Padding(5);
             lblVal2.Name = "lblVal2";
-            lblVal2.Size = new Size(86, 116);
+            lblVal2.Size = new Size(86, 74);
             lblVal2.TabIndex = 5;
             lblVal2.Text = "99,9";
             lblVal2.TextAlign = ContentAlignment.MiddleCenter;
@@ -222,7 +224,7 @@ namespace TemperatureMonitor
             lblVal3.Location = new Point(197, 89);
             lblVal3.Margin = new Padding(5);
             lblVal3.Name = "lblVal3";
-            lblVal3.Size = new Size(86, 116);
+            lblVal3.Size = new Size(86, 74);
             lblVal3.TabIndex = 6;
             lblVal3.Text = "99,9";
             lblVal3.TextAlign = ContentAlignment.MiddleCenter;
@@ -236,7 +238,7 @@ namespace TemperatureMonitor
             lblVal4.Location = new Point(293, 89);
             lblVal4.Margin = new Padding(5);
             lblVal4.Name = "lblVal4";
-            lblVal4.Size = new Size(86, 116);
+            lblVal4.Size = new Size(86, 74);
             lblVal4.TabIndex = 7;
             lblVal4.Text = "N/A";
             lblVal4.TextAlign = ContentAlignment.MiddleCenter;
@@ -251,11 +253,11 @@ namespace TemperatureMonitor
             listBox1.FormattingEnabled = true;
             listBox1.ItemHeight = 17;
             listBox1.Items.AddRange(new object[] { "asd", "qwe", "zxc", "rty", "fgh", "vbn" });
-            listBox1.Location = new Point(5, 215);
+            listBox1.Location = new Point(5, 173);
             listBox1.Margin = new Padding(5);
             listBox1.Name = "listBox1";
             listBox1.RightToLeft = RightToLeft.No;
-            listBox1.Size = new Size(86, 155);
+            listBox1.Size = new Size(86, 189);
             listBox1.TabIndex = 9;
             listBox1.SelectedIndexChanged += listBox1_SelectedIndexChanged;
             // 
@@ -263,16 +265,29 @@ namespace TemperatureMonitor
             // 
             btnStartStop.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             btnStartStop.BackColor = Color.FromArgb(64, 64, 64);
-            mainTable.SetColumnSpan(btnStartStop, 4);
+            mainTable.SetColumnSpan(btnStartStop, 3);
             btnStartStop.ForeColor = Color.Silver;
             btnStartStop.Location = new Point(5, 383);
             btnStartStop.Margin = new Padding(5);
             btnStartStop.Name = "btnStartStop";
-            btnStartStop.Size = new Size(374, 33);
+            btnStartStop.Size = new Size(278, 33);
             btnStartStop.TabIndex = 1;
             btnStartStop.Text = "Start";
             btnStartStop.UseVisualStyleBackColor = false;
             btnStartStop.Click += btnStartStop_Click;
+            // 
+            // btnOtherUI
+            // 
+            btnOtherUI.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            btnOtherUI.BackColor = Color.FromArgb(64, 64, 64);
+            btnOtherUI.ForeColor = Color.Silver;
+            btnOtherUI.Location = new Point(291, 381);
+            btnOtherUI.Name = "btnOtherUI";
+            btnOtherUI.Size = new Size(90, 37);
+            btnOtherUI.TabIndex = 13;
+            btnOtherUI.Text = "flow";
+            btnOtherUI.UseVisualStyleBackColor = false;
+            btnOtherUI.Click += btnOtherUI_Click;
             // 
             // MainUI
             // 
@@ -307,5 +322,6 @@ namespace TemperatureMonitor
         private ListBox listBox4;
         private ListBox listBox3;
         private Button btnStartStop;
+        private Button btnOtherUI;
     }
 }
