@@ -31,7 +31,6 @@ namespace TemperatureMonitor.Monitor
             Dictionary<String, float> values = new Dictionary<String, float>();
             foreach (IHardware hardware in computer.Hardware)
             {
-                
                 //Console.WriteLine("Hardware: {0}", hardware.Name);
                 foreach (IHardware subhardware in hardware.SubHardware)
                 {

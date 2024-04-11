@@ -5,23 +5,27 @@ namespace TemperatureMonitor
 {
     internal class MonitorComponent : TableLayoutPanel
     {
+        private readonly ColorCalculator colorCalculator;
 
-        private Label keyLbl;
-        private Label valLbl;
-        private ListBox listBox;
-        private CheckBox cb;
+        private readonly Label keyLbl;
+        private readonly Label valLbl;
+        private readonly ListBox listBox;
+        private readonly CheckBox cb;
 
         private Dictionary<string, float> data;
-        private ColorCalculator colorCalculator;
 
-        public MonitorComponent(string key, string val, List<string> list)
+        public MonitorComponent(List<string> items, ColorCalculator? colorCalculator = null)
         {
-            data = new Dictionary<string, float>();
-            colorCalculator = new ColorCalculator();
-            initControls(key, val, list);
+            this.colorCalculator = colorCalculator ?? new ColorCalculator();
+            cb = new CheckBox();
+            keyLbl = new Label();
+            valLbl = new Label();
+            listBox = new ListBox();
+            data = [];
+            InitControls("Select sensor", "N/A", items);
         }
         
-        private void initControls(string key, string val, List<string> list)
+        private void InitControls(string key, string val, List<string> list)
         {
             //this.SuspendLayout();
             this.Size = new Size(188, 400);
@@ -45,14 +49,13 @@ namespace TemperatureMonitor
             this.Visible = true;
             this.TabIndex = 10;
 
-            cb = new CheckBox();
+            // Checkbox
             cb.Anchor = AnchorStyles.Right;
             cb.AutoSize = true;
             cb.Checked = false;
 
-            keyLbl = new Label();
+            // Key label
             keyLbl.Text = key;
-
             keyLbl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             keyLbl.AutoSize = true;
             keyLbl.Font = new Font("Segoe UI", 16F);
@@ -65,10 +68,8 @@ namespace TemperatureMonitor
             keyLbl.TextAlign = ContentAlignment.MiddleCenter;
             keyLbl.TabIndex = 2;
 
-
-            valLbl = new Label();
+            // Value label
             valLbl.Text = val;
-
             valLbl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             valLbl.AutoSize = true;
             valLbl.Font = new Font("Segoe UI", 24F, FontStyle.Bold);
@@ -81,7 +82,7 @@ namespace TemperatureMonitor
             valLbl.TextAlign = ContentAlignment.MiddleCenter;
             valLbl.TabIndex = 2;
 
-            listBox = new ListBox();
+            // Listbox
             foreach (string item in list)
             {
                 listBox.Items.Add(item);
@@ -138,7 +139,7 @@ namespace TemperatureMonitor
                 string key = box.SelectedItem.ToString() ?? "null";
                 keyLbl.Text = key;
                 valLbl.Text = this.data.TryGetValue(key, out float value) ? Math.Round(value, 0).ToString() : "-1";
-                valLbl.ForeColor = colorCalculator.computeColor(value);
+                valLbl.ForeColor = colorCalculator.ComputeTemperatureColor(value);
             }
         }
     }

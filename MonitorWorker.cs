@@ -14,14 +14,14 @@ namespace TemperatureMonitor
         private List<MonitorComponent> mcs;
         private List<string> sensorNames;
 
-        public MonitorWorker() 
+        public MonitorWorker()
         {
             m = new Monitor.Monitor();
             sensorNames = m.updateSensors(true).Keys.ToList();
             mcs = new List<MonitorComponent>();
         }
 
-        public async void doWork()
+        public void doWork()
         {
             while (shouldRun)
             {

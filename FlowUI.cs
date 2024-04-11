@@ -1,19 +1,17 @@
 ﻿namespace TemperatureMonitor
 {
-    public partial class OtherUI : Form
+    public partial class FlowUI : Form
     {
         private MainUI mainUI;
         private List<MonitorComponent> monitorComponents;
         private Thread? monitorThread;
         private MonitorWorker worker;
-        public OtherUI(MainUI parent)
+        public FlowUI(MainUI parent)
         {
             this.mainUI = parent;
             InitializeComponent();
-            monitorComponents = new List<MonitorComponent>();
+            monitorComponents = [];
             worker = new MonitorWorker();
-
-
             monitorThread = null;
             //thread.Start();
         }
@@ -29,22 +27,14 @@
             {
                 monitorThread.Start();
             }
-            //List<string> list = new List<string>();
-            //list.Add("1");
-            //list.Add("2");
-            //list.Add("3");
             //flp.SuspendLayout();
-            MonitorComponent c = new MonitorComponent("Select sensor", "N/A", worker.getSensorNames());
-            //c.PerformLayout();
-            c.Visible = true;
+            MonitorComponent c = new(worker.getSensorNames());
             flp.Controls.Add(c);
             //flp.ResumeLayout(false);
             flp.PerformLayout();
-            //Controls.Add(c);
             monitorComponents.Add(c);
 
             worker.setComponents(monitorComponents);
-
         }
 
         private void btnRem_Click(object sender, EventArgs e)

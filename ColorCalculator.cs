@@ -1,38 +1,65 @@
 ﻿namespace TemperatureMonitor
 {
-    internal class ColorCalculator
+    public class ColorCalculator
     {
-        public Color computeColor(double temp)
+        public const string DarkLevelInvalid = "Dark level should be between 0 and 1";
+
+        private float darkLevel = 0.25F; // default one fourth
+
+        // percent of how much is subtracted from 255 (256)
+        // 0 being 255 - 0 = 255
+        // 1 being 255 - 255 = 0
+        public void SetDarkLevel(float darkLevel)
         {
-            int low = 20;
-            int max = 100;
-            int mid = 60;
-            int range = max - low;
-
-            if (temp < 0)
+            if (darkLevel < 0 || darkLevel > 1) 
             {
-                return Color.FromArgb(255, 255, 255); // when all else fails
+                throw new ArgumentException(DarkLevelInvalid);
             }
 
-            if (temp <= low)
+            this.darkLevel = darkLevel;
+        }
+
+        public Color ComputeTemperatureColor(double temp)
+        {
+            return Compute(temp, 20, 100);
+        }
+        public Color ComputeLoadColor(double load)
+        {
+            return Compute(load, 0, 100);
+        }
+
+        private Color Compute(double value, int min, int max)
+        {
+            float mid = (min + max) / 2;
+            float inc = max - mid;
+            if (value < 0)
             {
-                return Color.FromArgb(0, 192, 0);
+                return Color.FromArgb(255, 255, 255); // for value such as -1
             }
-            else if (temp >= max)
+
+            if (value <= min)
             {
-                return Color.FromArgb(192, 0, 0);
+                return Color.FromArgb(0, (int)(255 * (1 - darkLevel)), 0);
             }
-            else if (temp >= mid) // orangish
+            else if (value >= max)
             {
-                return Color.FromArgb(192, (int)(((((max - temp) / 10) / 4) * 255) * 0.75), 0);
+                return Color.FromArgb((int)(255 * (1 - darkLevel)), 0, 0);
             }
-            else if (temp < mid) // yellowgreen
+            else if (value >= mid) // orangish
             {
-                return Color.FromArgb((int)(((1 - (((mid - temp) / 10) / 4)) * 255) * 0.75), 192, 0);
+                return Color.FromArgb((int)(255 * (1 - darkLevel)),
+                    (int)((max - value) / inc * 255 * (1 - darkLevel)),
+                    0);
+            }
+            else if (value < mid) // yellowgreen
+            {
+                return Color.FromArgb((int)((1 - ((mid - value) / inc)) * 255 * (1 - darkLevel)),
+                    (int)(255 * (1 - darkLevel)),
+                    0);
             }
             else
             {
-                return Color.FromArgb(255, 255, 255); // when all else fails
+                return Color.FromArgb(0, 0, 0); // should never come here
             }
         }
     }

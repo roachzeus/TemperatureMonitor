@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace TemperatureMonitor
 {
     public partial class MainUI : Form
@@ -7,14 +9,14 @@ namespace TemperatureMonitor
         private List<String> polledItems;
         private Thread? workerThread;
         private bool shouldMonitorRun = true;
-        private OtherUI otherUI;
+        private FlowUI otherUI;
 
         public MainUI()
         {
             monitor = new Monitor.Monitor();
             cCal = new ColorCalculator();
             polledItems = new List<String>() { "", "", "", "" };
-            otherUI = new OtherUI(this);
+            otherUI = new FlowUI(this);
             otherUI.Hide();
 
             //otherUI.Visible = false;
@@ -61,49 +63,49 @@ namespace TemperatureMonitor
                         {
                             lblKey1.Text = polledItems[0];
                             lblVal1.Text = Math.Round(map[polledItems[0]], 0).ToString();
-                            lblVal1.ForeColor = cCal.computeColor((double)map[polledItems[0]]);
+                            lblVal1.ForeColor = cCal.ComputeTemperatureColor((double)map[polledItems[0]]);
                         }
                         else
                         {
                             lblKey1.Text = "N/A";
                             lblVal1.Text = "-1";
-                            lblVal1.ForeColor = cCal.computeColor((double)-1);
+                            lblVal1.ForeColor = cCal.ComputeTemperatureColor((double)-1);
                         }
                         if (map.ContainsKey(polledItems[1]))
                         {
                             lblKey2.Text = polledItems[1];
                             lblVal2.Text = Math.Round(map[polledItems[1]], 0).ToString();
-                            lblVal2.ForeColor = cCal.computeColor((double)map[polledItems[1]]);
+                            lblVal2.ForeColor = cCal.ComputeTemperatureColor((double)map[polledItems[1]]);
                         }
                         else
                         {
                             lblKey2.Text = "N/A";
                             lblVal2.Text = "-1";
-                            lblVal2.ForeColor = cCal.computeColor((double)-1);
+                            lblVal2.ForeColor = cCal.ComputeTemperatureColor((double)-1);
                         }
                         if (map.ContainsKey(polledItems[2]))
                         {
                             lblKey3.Text = polledItems[2];
                             lblVal3.Text = Math.Round(map[polledItems[2]], 0).ToString();
-                            lblVal3.ForeColor = cCal.computeColor((double)map[polledItems[2]]);
+                            lblVal3.ForeColor = cCal.ComputeTemperatureColor((double)map[polledItems[2]]);
                         }
                         else
                         {
                             lblKey3.Text = "N/A";
                             lblVal3.Text = "-1";
-                            lblVal3.ForeColor = cCal.computeColor((double)-1);
+                            lblVal3.ForeColor = cCal.ComputeTemperatureColor((double)-1);
                         }
                         if (map.ContainsKey(polledItems[3]))
                         {
                             lblKey4.Text = polledItems[3];
                             lblVal4.Text = Math.Round(map[polledItems[3]], 0).ToString();
-                            lblVal4.ForeColor = cCal.computeColor((double)map[polledItems[3]]);
+                            lblVal4.ForeColor = cCal.ComputeTemperatureColor((double)map[polledItems[3]]);
                         }
                         else
                         {
                             lblKey4.Text = "N/A";
                             lblVal4.Text = "-1";
-                            lblVal4.ForeColor = cCal.computeColor((double)-1);
+                            lblVal4.ForeColor = cCal.ComputeTemperatureColor((double)-1);
                         }
                     });
                     Thread.Sleep(1000);
@@ -192,7 +194,7 @@ namespace TemperatureMonitor
             
             if(otherUI == null || otherUI.IsDisposed)
             {
-                otherUI = new OtherUI(this);
+                otherUI = new FlowUI(this);
                 otherUI.Show();
             }
             else if (!otherUI.Visible)

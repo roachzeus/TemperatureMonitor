@@ -1,6 +1,6 @@
 ﻿namespace TemperatureMonitor
 {
-    partial class OtherUI
+    partial class FlowUI
     {
         /// <summary>
         /// Required designer variable.
