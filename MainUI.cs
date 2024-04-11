@@ -1,3 +1,4 @@
+using LibreHardwareMonitor.Hardware;
 using System.Diagnostics;
 
 namespace TemperatureMonitor
@@ -11,6 +12,8 @@ namespace TemperatureMonitor
         private bool shouldMonitorRun = true;
         private FlowUI otherUI;
 
+        private List<ISensor> sensorList;
+
         public MainUI()
         {
             monitor = new Monitor.Monitor();
@@ -19,6 +22,7 @@ namespace TemperatureMonitor
             otherUI = new FlowUI(this);
             otherUI.Hide();
 
+            sensorList = new List<ISensor>();
             //otherUI.Visible = false;
             InitializeComponent();
             initSensorsList();
@@ -191,8 +195,8 @@ namespace TemperatureMonitor
 
         private void btnOtherUI_Click(object sender, EventArgs e)
         {
-            
-            if(otherUI == null || otherUI.IsDisposed)
+
+            if (otherUI == null || otherUI.IsDisposed)
             {
                 otherUI = new FlowUI(this);
                 otherUI.Show();
@@ -200,10 +204,22 @@ namespace TemperatureMonitor
             else if (!otherUI.Visible)
             {
                 otherUI.Show();
-            } else
+            }
+            else
             {
                 otherUI.Hide();
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (sensorList.Count == 0)
+            {
+                sensorList = monitor.GetAll();
+            }
+            Debug.WriteLine("Found:");
+            sensorList.ForEach(delegate (ISensor s) { Debug.WriteLine("{0} - {1} - {2} - ", s.SensorType, s.Name, s.Value); });
+
         }
     }
 }

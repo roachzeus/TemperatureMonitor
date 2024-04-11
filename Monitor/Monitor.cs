@@ -2,15 +2,88 @@
 
 namespace TemperatureMonitor.Monitor
 {
-    public class Monitor
+    // TODO refactor class to internal
+    internal class Monitor
     {
-        //private bool shoudRun = true;
-        //private Dictionary<String, float> valueData;
-        private UpdateVisitor visitor;
+        private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+
+        public const string sensorTemperature = "Temperature";
+        public const string sensorLoad = "Load";
+        public const string sensorFan = "Fan";
+        public const string sensorControl = "Control";
+
+        private readonly UpdateVisitor visitor;
+        private List<ISensor> lastData;
         public Monitor()
         {
-            //this.valueData = new Dictionary<String, float>();
             visitor = new UpdateVisitor();
+            lastData = [];
+        }
+        public Monitor(UpdateVisitor visitor)
+        {
+            this.visitor = visitor;
+            lastData = [];
+        }
+        /*
+        public List<ISensor> GetTemperatures()
+        {
+            semaphoreSlim.Wait();
+            try
+            {
+                return lastData.FindAll(s => s.SensorType.ToString() == sensorTemperature);
+            } finally
+            {
+                semaphoreSlim.Release();
+            }
+        }
+        public List<ISensor> GetLoads()
+        {
+            semaphoreSlim.Wait();
+            try
+            {
+                return lastData.FindAll(s => s.SensorType.ToString() == sensorLoad);
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+        }
+        public List<ISensor> GetFansAsRpm()
+        {
+            semaphoreSlim.Wait();
+            try
+            {
+                return lastData.FindAll(s => s.SensorType.ToString() == sensorFan);
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+        }
+        public List<ISensor> GetFansAsLoad()
+        {
+            semaphoreSlim.Wait();
+            try
+            {
+                return lastData.FindAll(s => s.SensorType.ToString() == sensorControl);
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+        }
+        */
+        public List<ISensor> GetAll()
+        {
+            semaphoreSlim.Wait();
+            try
+            {
+                return lastData;
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
         }
 
         public Dictionary<String, float> updateSensors(bool includeMobo)
@@ -72,6 +145,56 @@ namespace TemperatureMonitor.Monitor
 
             computer.Close();
             return values;
+        }
+
+        public void UpdateSensors()
+        {
+            Computer computer = getDefaultComputer();
+            computer.Open();
+            computer.Accept(visitor);
+
+            List<ISensor> sensors = [];
+            foreach (IHardware hardware in computer.Hardware)
+            {
+                foreach (IHardware subhardware in hardware.SubHardware)
+                {
+                    foreach (ISensor sensor in subhardware.Sensors)
+                    {
+                        sensors.Add(sensor);
+                    }
+                }
+
+                foreach (ISensor sensor in hardware.Sensors)
+                {
+                    sensors.Add(sensor);
+                }
+            }
+
+            computer.Close();
+
+            semaphoreSlim.Wait();
+            try
+            {
+                lastData = sensors;
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+        }
+
+        private Computer getDefaultComputer()
+        {
+            return new Computer
+            {
+                IsCpuEnabled = true,
+                IsGpuEnabled = true,
+                IsMemoryEnabled = false,
+                IsMotherboardEnabled = true,
+                IsControllerEnabled = false,
+                IsNetworkEnabled = false,
+                IsStorageEnabled = false
+            };
         }
     }
 }

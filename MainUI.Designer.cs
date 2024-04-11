@@ -44,6 +44,7 @@ namespace TemperatureMonitor
             listBox1 = new ListBox();
             btnStartStop = new Button();
             btnOtherUI = new Button();
+            button1 = new Button();
             mainTable.SuspendLayout();
             SuspendLayout();
             // 
@@ -69,6 +70,7 @@ namespace TemperatureMonitor
             mainTable.Controls.Add(listBox1, 0, 2);
             mainTable.Controls.Add(btnStartStop, 0, 3);
             mainTable.Controls.Add(btnOtherUI, 3, 3);
+            mainTable.Controls.Add(button1, 2, 3);
             mainTable.Location = new Point(20, 20);
             mainTable.Margin = new Padding(10);
             mainTable.Name = "mainTable";
@@ -265,12 +267,12 @@ namespace TemperatureMonitor
             // 
             btnStartStop.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             btnStartStop.BackColor = Color.FromArgb(64, 64, 64);
-            mainTable.SetColumnSpan(btnStartStop, 3);
+            mainTable.SetColumnSpan(btnStartStop, 2);
             btnStartStop.ForeColor = Color.Silver;
             btnStartStop.Location = new Point(5, 383);
             btnStartStop.Margin = new Padding(5);
             btnStartStop.Name = "btnStartStop";
-            btnStartStop.Size = new Size(278, 33);
+            btnStartStop.Size = new Size(182, 33);
             btnStartStop.TabIndex = 1;
             btnStartStop.Text = "Start";
             btnStartStop.UseVisualStyleBackColor = false;
@@ -288,6 +290,17 @@ namespace TemperatureMonitor
             btnOtherUI.Text = "flow";
             btnOtherUI.UseVisualStyleBackColor = false;
             btnOtherUI.Click += btnOtherUI_Click;
+            // 
+            // button1
+            // 
+            button1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            button1.Location = new Point(195, 381);
+            button1.Name = "button1";
+            button1.Size = new Size(90, 37);
+            button1.TabIndex = 14;
+            button1.Text = "button1";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // MainUI
             // 
@@ -323,5 +336,6 @@ namespace TemperatureMonitor
         private ListBox listBox3;
         private Button btnStartStop;
         private Button btnOtherUI;
+        private Button button1;
     }
 }
