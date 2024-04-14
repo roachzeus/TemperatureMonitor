@@ -90,7 +90,7 @@ namespace TemperatureMonitor.Monitor
         {
             while (shouldRun)
             {
-                Debug.WriteLine("Updating sensors...");
+                //Debug.WriteLine("Updating sensors...");
                 subscribers.ForEach(sub => {
                     sub.OnDataUpdated(LoopAll());
                 });

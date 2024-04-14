@@ -69,16 +69,6 @@ namespace TemperatureMonitor.View
             return flp.Controls.OfType<MonitorComponent>().ToList();
         }
 
-        public void SetComponentValues(string id, string key, string value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void setComponentItems(string id, List<string> items)
-        {
-            throw new NotImplementedException();
-        }
-
         private void btnAddTemp_Click(object sender, EventArgs e)
         {
             // If it's really null, then you have miswired the app and it's your fault
@@ -94,12 +84,17 @@ namespace TemperatureMonitor.View
         private void btnAddFan_Click(object sender, EventArgs e)
         {
             // If it's really null, then you have miswired the app and it's your fault
-            this.presenter.OnAddFanButtonClicked();
+            this.presenter.OnAddFanCtrlButtonClicked();
         }
 
         private void btnRem_Click(object sender, EventArgs e)
         {
             this.presenter.OnRemoveButtonClicked();
+        }
+
+        private void btnAddFanPer_Click(object sender, EventArgs e)
+        {
+            this.presenter.OnAddFanPerButtonClicked();
         }
     }
 }

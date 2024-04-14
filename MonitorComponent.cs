@@ -141,7 +141,22 @@ namespace TemperatureMonitor
                 string key = box.SelectedItem.ToString() ?? "null";
                 keyLbl.Text = key;
                 valLbl.Text = this.data.TryGetValue(key, out float value) ? Math.Round(value, 0).ToString() : "-1";
-                valLbl.ForeColor = colorCalculator.ComputeTemperatureColor(value);
+
+                switch (type)
+                {
+                    case Monitor.Monitor.sensorTemperature:
+                        valLbl.ForeColor = colorCalculator.ComputeTemperatureColor(value);
+                        break;
+                    case Monitor.Monitor.sensorFan:
+                        valLbl.ForeColor = colorCalculator.ComputeFanSpeedColor(value);
+                        break;
+                    case Monitor.Monitor.sensorControl:
+                    case Monitor.Monitor.sensorLoad:
+                    default:
+                        valLbl.ForeColor = colorCalculator.ComputeLoadColor(value);
+                        break;
+                }
+                
             }
         }
     }

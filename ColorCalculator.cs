@@ -27,7 +27,17 @@
         {
             return Compute(load, 0, 100);
         }
+        public Color White()
+        {
+            return Color.FromArgb((int)(255 * (1 - darkLevel)),
+                (int)(255 * (1 - darkLevel)),
+                (int)(255 * (1 - darkLevel)));
+        }
 
+        public Color ComputeFanSpeedColor(double rpm)
+        {
+            return Compute(rpm, 200, 2000);
+        }
         private Color Compute(double value, int min, int max)
         {
             float mid = (min + max) / 2;

@@ -1,4 +1,5 @@
 ﻿using LibreHardwareMonitor.Hardware;
+using System.Diagnostics;
 using TemperatureMonitor.Model;
 using TemperatureMonitor.View;
 
@@ -15,15 +16,18 @@ namespace TemperatureMonitor.Presenter
             this.view.SetPresenter(this);
             this.model.SetPresenter(this);
         }
-
-        public void OnAddFanButtonClicked()
+        public void OnAddFanPerButtonClicked()
         {
-            throw new NotImplementedException();
+            AddControl(Monitor.Monitor.sensorFan);
+        }
+        public void OnAddFanCtrlButtonClicked()
+        {
+            AddControl(Monitor.Monitor.sensorControl);
         }
 
         public void OnAddLoadButtonClicked()
         {
-            throw new NotImplementedException();
+            AddControl(Monitor.Monitor.sensorLoad);
         }
 
         public void OnAddTempButtonClicked()
@@ -54,7 +58,11 @@ namespace TemperatureMonitor.Presenter
                 Dictionary<string, float> data = [];
                 foreach (ISensor sensor in sensorData[type])
                 {
-                    data.Add(sensor.Name, sensor.Value ?? -1);
+                    if(!data.TryAdd(sensor.Name, sensor.Value ?? -1))
+                    {
+                        Debug.WriteLine("WARN: duplicate '{0} and {1}' found. Skipping...", sensor.Name, sensor.Value);
+                    }
+                    
                 }
                 c.UpdateData(data);
             }

@@ -37,7 +37,8 @@ namespace TemperatureMonitor.View
             flp = new FlowLayoutPanel();
             btnAddTemp = new Button();
             btnAddLoad = new Button();
-            btnAddFan = new Button();
+            btnAddFanCtrl = new Button();
+            btnAddFanPer = new Button();
             btnRem = new Button();
             flp.SuspendLayout();
             SuspendLayout();
@@ -47,7 +48,8 @@ namespace TemperatureMonitor.View
             flp.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             flp.Controls.Add(btnAddTemp);
             flp.Controls.Add(btnAddLoad);
-            flp.Controls.Add(btnAddFan);
+            flp.Controls.Add(btnAddFanCtrl);
+            flp.Controls.Add(btnAddFanPer);
             flp.Controls.Add(btnRem);
             flp.Location = new Point(10, 10);
             flp.Margin = new Padding(5);
@@ -81,19 +83,35 @@ namespace TemperatureMonitor.View
             btnAddLoad.TabIndex = 1;
             btnAddLoad.Text = "Add Load";
             btnAddLoad.UseVisualStyleBackColor = false;
+            btnAddLoad.Click += btnAddLoad_Click;
             // 
-            // btnAddFan
+            // btnAddFanCtrl
             // 
-            btnAddFan.Anchor = AnchorStyles.Left;
-            btnAddFan.BackColor = Color.FromArgb(64, 64, 64);
-            btnAddFan.ForeColor = Color.Silver;
-            btnAddFan.Location = new Point(191, 5);
-            btnAddFan.Margin = new Padding(5);
-            btnAddFan.Name = "btnAddFan";
-            btnAddFan.Size = new Size(83, 23);
-            btnAddFan.TabIndex = 2;
-            btnAddFan.Text = "Add Fan";
-            btnAddFan.UseVisualStyleBackColor = false;
+            btnAddFanCtrl.Anchor = AnchorStyles.Left;
+            btnAddFanCtrl.BackColor = Color.FromArgb(64, 64, 64);
+            btnAddFanCtrl.ForeColor = Color.Silver;
+            btnAddFanCtrl.Location = new Point(191, 5);
+            btnAddFanCtrl.Margin = new Padding(5);
+            btnAddFanCtrl.Name = "btnAddFanCtrl";
+            btnAddFanCtrl.Size = new Size(83, 23);
+            btnAddFanCtrl.TabIndex = 2;
+            btnAddFanCtrl.Text = "Add Fan Ctrl";
+            btnAddFanCtrl.UseVisualStyleBackColor = false;
+            btnAddFanCtrl.Click += btnAddFan_Click;
+            // 
+            // btnAddFanPer
+            // 
+            btnAddFanPer.Anchor = AnchorStyles.Left;
+            btnAddFanPer.BackColor = Color.FromArgb(64, 64, 64);
+            btnAddFanPer.ForeColor = Color.Silver;
+            btnAddFanPer.Location = new Point(284, 5);
+            btnAddFanPer.Margin = new Padding(5);
+            btnAddFanPer.Name = "btnAddFanPer";
+            btnAddFanPer.Size = new Size(83, 23);
+            btnAddFanPer.TabIndex = 4;
+            btnAddFanPer.Text = "Add Fan %";
+            btnAddFanPer.UseVisualStyleBackColor = false;
+            btnAddFanPer.Click += btnAddFanPer_Click;
             // 
             // btnRem
             // 
@@ -101,7 +119,7 @@ namespace TemperatureMonitor.View
             btnRem.BackColor = Color.FromArgb(64, 64, 64);
             flp.SetFlowBreak(btnRem, true);
             btnRem.ForeColor = Color.Silver;
-            btnRem.Location = new Point(284, 5);
+            btnRem.Location = new Point(5, 38);
             btnRem.Margin = new Padding(5);
             btnRem.Name = "btnRem";
             btnRem.Size = new Size(86, 23);
@@ -131,7 +149,8 @@ namespace TemperatureMonitor.View
         private FlowLayoutPanel flp;
         private Button btnAddTemp;
         private Button btnRem;
-        private Button btnAddFan;
+        private Button btnAddFanCtrl;
         private Button btnAddLoad;
+        private Button btnAddFanPer;
     }
 }

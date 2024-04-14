@@ -6,7 +6,8 @@ namespace TemperatureMonitor.Presenter
     {
         public void OnAddTempButtonClicked();
         public void OnAddLoadButtonClicked();
-        public void OnAddFanButtonClicked();
+        public void OnAddFanCtrlButtonClicked();
+        public void OnAddFanPerButtonClicked();
         public void OnRemoveButtonClicked();
         public void OnDataUpdated(Dictionary<string, List<ISensor>> sensorData);
         public void StopMonitor();
