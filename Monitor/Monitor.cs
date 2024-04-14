@@ -1,11 +1,11 @@
 ﻿using LibreHardwareMonitor.Hardware;
+using System.Diagnostics;
 
 namespace TemperatureMonitor.Monitor
 {
-    // TODO refactor class to internal
     internal class Monitor
     {
-        private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+        //private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
         public const string sensorTemperature = "Temperature";
         public const string sensorLoad = "Load";
@@ -13,141 +13,53 @@ namespace TemperatureMonitor.Monitor
         public const string sensorControl = "Control";
 
         private readonly UpdateVisitor visitor;
-        private List<ISensor> lastData;
+        private Thread? t;
+        //private List<ISensor> lastData;
+        private List<ISubscriber> subscribers;
+        private bool shouldRun = true;
+        private int sleepInterval = 100;
         public Monitor()
         {
             visitor = new UpdateVisitor();
-            lastData = [];
+            t = new Thread(new ThreadStart(this.RunThread));
+            //lastData = [];
+            subscribers = [];
         }
-        public Monitor(UpdateVisitor visitor)
+        public Monitor(UpdateVisitor visitor, Thread t)
         {
             this.visitor = visitor;
-            lastData = [];
+            this.t = t;
+            //lastData = [];
+            subscribers = [];
         }
-        /*
-        public List<ISensor> GetTemperatures()
+
+        public void Start()
         {
-            semaphoreSlim.Wait();
-            try
-            {
-                return lastData.FindAll(s => s.SensorType.ToString() == sensorTemperature);
-            } finally
-            {
-                semaphoreSlim.Release();
-            }
+            t.Start();
         }
-        public List<ISensor> GetLoads()
+
+        public void Stop()
         {
-            semaphoreSlim.Wait();
-            try
-            {
-                return lastData.FindAll(s => s.SensorType.ToString() == sensorLoad);
-            }
-            finally
-            {
-                semaphoreSlim.Release();
-            }
+            sleepInterval = 1;
+            shouldRun = false;
+            //t.Join();
+            //t = null;
         }
-        public List<ISensor> GetFansAsRpm()
+
+        public void AddSubscriber(ISubscriber subscriber)
         {
-            semaphoreSlim.Wait();
-            try
-            {
-                return lastData.FindAll(s => s.SensorType.ToString() == sensorFan);
-            }
-            finally
-            {
-                semaphoreSlim.Release();
-            }
+            subscribers.Add(subscriber);
         }
-        public List<ISensor> GetFansAsLoad()
+
+        public void RemoveSubscriber(ISubscriber subscriber) {
+            subscribers.Remove(subscriber);
+        }
+        public List<ISensor> GetReadings()
         {
-            semaphoreSlim.Wait();
-            try
-            {
-                return lastData.FindAll(s => s.SensorType.ToString() == sensorControl);
-            }
-            finally
-            {
-                semaphoreSlim.Release();
-            }
-        }
-        */
-        public List<ISensor> GetAll()
-        {
-            semaphoreSlim.Wait();
-            try
-            {
-                return lastData;
-            }
-            finally
-            {
-                semaphoreSlim.Release();
-            }
+            return LoopAll();
         }
 
-        public Dictionary<String, float> updateSensors(bool includeMobo)
-        {
-            Computer computer = new Computer
-            {
-                IsCpuEnabled = true,
-                IsGpuEnabled = true,
-                IsMemoryEnabled = false,
-                IsMotherboardEnabled = includeMobo,
-                IsControllerEnabled = false,
-                IsNetworkEnabled = false,
-                IsStorageEnabled = false
-            };
-
-            computer.Open();
-            computer.Accept(visitor);
-            Dictionary<String, float> values = new Dictionary<String, float>();
-            foreach (IHardware hardware in computer.Hardware)
-            {
-                //Console.WriteLine("Hardware: {0}", hardware.Name);
-                foreach (IHardware subhardware in hardware.SubHardware)
-                {
-                   //Console.WriteLine("\tSubhardware: {0}", subhardware.Name);
-
-                    foreach (ISensor sensor in subhardware.Sensors)
-                    {
-                        if (sensor.SensorType.ToString() != "Temperature")
-                        {
-                            continue;
-                        }
-                        values.Add(sensor.Name, sensor.Value ?? -1);
-                        //Console.WriteLine("\t\tSensor: {0}, value: {1}", sensor.Name, sensor.Value);
-                    }
-                }
-                
-                foreach (ISensor sensor in hardware.Sensors)
-                {
-                    //Console.WriteLine("\tSensor: {0}, value: {1}, type: {2}", sensor.Name, sensor.Value, sensor.SensorType);
-
-                    if (sensor.SensorType.ToString() != "Temperature")
-                    {
-                        continue;
-                    }
-
-                    if (sensor.Hardware.HardwareType.ToString() == "Cpu")
-                    {
-                        values.Add(sensor.Name, sensor.Value ?? -1);
-                        //Console.WriteLine("\tSensor: {0}, value: {1}, type: {2}", sensor.Name, sensor.Value, sensor.SensorType);
-
-                    }
-                    else if (sensor.Hardware.HardwareType.ToString() == "GpuNvidia" || sensor.Hardware.HardwareType.ToString() == "GpuAmd")
-                    {
-                        values.Add(sensor.Name, sensor.Value ?? -1);
-                        //Console.WriteLine("\tSensor: {0}, value: {1}, type: {2}", sensor.Name, sensor.Value, sensor.SensorType);
-                    }
-                }
-            }
-
-            computer.Close();
-            return values;
-        }
-
-        public void UpdateSensors()
+        private List<ISensor> LoopAll()
         {
             Computer computer = getDefaultComputer();
             computer.Open();
@@ -172,17 +84,37 @@ namespace TemperatureMonitor.Monitor
 
             computer.Close();
 
+            return sensors;
+        }
+        private void RunThread()
+        {
+            while (shouldRun)
+            {
+                Debug.WriteLine("Updating sensors...");
+                subscribers.ForEach(sub => {
+                    sub.OnDataUpdated(LoopAll());
+                });
+
+                for (int i = 0; i < 10; i++)
+                {
+                    Thread.Sleep(sleepInterval);
+                }
+            }
+        }
+        /*
+        public List<ISensor> GetAll()
+        {
             semaphoreSlim.Wait();
             try
             {
-                lastData = sensors;
+                return lastData;
             }
             finally
             {
                 semaphoreSlim.Release();
             }
         }
-
+        */
         private Computer getDefaultComputer()
         {
             return new Computer

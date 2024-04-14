@@ -3,7 +3,8 @@ using System.Windows.Forms;
 
 namespace TemperatureMonitor
 {
-    internal class MonitorComponent : TableLayoutPanel
+    // TODO should be internal class? and it's interface should be public?
+    public class MonitorComponent : TableLayoutPanel
     {
         private readonly ColorCalculator colorCalculator;
 
@@ -13,8 +14,9 @@ namespace TemperatureMonitor
         private readonly CheckBox cb;
 
         private Dictionary<string, float> data;
+        private string type;
 
-        public MonitorComponent(List<string> items, ColorCalculator? colorCalculator = null)
+        public MonitorComponent(string type, List<string> items, ColorCalculator? colorCalculator = null)
         {
             this.colorCalculator = colorCalculator ?? new ColorCalculator();
             cb = new CheckBox();
@@ -22,16 +24,17 @@ namespace TemperatureMonitor
             valLbl = new Label();
             listBox = new ListBox();
             data = [];
+            this.type = type;
             InitControls("Select sensor", "N/A", items);
         }
         
         private void InitControls(string key, string val, List<string> list)
         {
             //this.SuspendLayout();
-            this.Size = new Size(188, 400);
+            this.Size = new Size(186, 400);
             //this.Width = 500;
             //this.Height = 500;
-            this.MinimumSize = new Size(188, 400);
+            this.MinimumSize = new Size(186, 400);
             //this.AutoSize = true;
             this.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             this.ColumnCount = 1;
@@ -72,7 +75,7 @@ namespace TemperatureMonitor
             valLbl.Text = val;
             valLbl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             valLbl.AutoSize = true;
-            valLbl.Font = new Font("Segoe UI", 24F, FontStyle.Bold);
+            valLbl.Font = new Font("Segoe UI", 32F, FontStyle.Bold);
             valLbl.ForeColor = Color.Silver;
             valLbl.Location = new Point(0, 0);
             valLbl.Margin = new Padding(5);
@@ -109,30 +112,29 @@ namespace TemperatureMonitor
             //this.ResumeLayout(false);
             //this.PerformLayout();
         }
-        public void setSelected(bool selected)
-        {
-            this.cb.Checked = selected;
-        }
 
-        public bool isSelected()
+        public bool IsSelected()
         {
             return cb.Checked;
         }
-
-        public void updateData(Dictionary<string, float> data)
+        public string GetComponentType()
+        {
+            return type;
+        }
+        public void UpdateData(Dictionary<string, float> data)
         {
             this.data = data;
             BeginInvoke(() => {
-                updateReading(listBox);
+                UpdateReading(listBox);
             }); 
         }
 
         private void selectedSensorChanged(object sender, EventArgs e)
         {
-            updateReading((ListBox)sender);
+            UpdateReading((ListBox)sender);
         }
 
-        private void updateReading(ListBox box)
+        private void UpdateReading(ListBox box)
         {
             if (box != null && box.SelectedItem != null)
             {
