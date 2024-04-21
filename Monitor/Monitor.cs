@@ -91,8 +91,9 @@ namespace TemperatureMonitor.Monitor
             while (shouldRun)
             {
                 //Debug.WriteLine("Updating sensors...");
+                List<ISensor> data = LoopAll();
                 subscribers.ForEach(sub => {
-                    sub.OnDataUpdated(LoopAll());
+                    sub.OnDataUpdated(data);
                 });
 
                 for (int i = 0; i < 10; i++)
@@ -117,15 +118,19 @@ namespace TemperatureMonitor.Monitor
         */
         private Computer getDefaultComputer()
         {
+
             return new Computer
             {
                 IsCpuEnabled = true,
                 IsGpuEnabled = true,
-                IsMemoryEnabled = false,
                 IsMotherboardEnabled = true,
+                //
+                IsMemoryEnabled = false,
                 IsControllerEnabled = false,
                 IsNetworkEnabled = false,
-                IsStorageEnabled = false
+                IsStorageEnabled = false,
+                IsPsuEnabled = false,
+                IsBatteryEnabled = false
             };
         }
     }

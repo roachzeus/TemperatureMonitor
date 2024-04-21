@@ -1,6 +1,7 @@
 ﻿using LibreHardwareMonitor.Hardware;
 using System.Diagnostics;
 using TemperatureMonitor.Model;
+using TemperatureMonitor.Monitor;
 using TemperatureMonitor.View;
 
 namespace TemperatureMonitor.Presenter
@@ -16,7 +17,7 @@ namespace TemperatureMonitor.Presenter
             this.view.SetPresenter(this);
             this.model.SetPresenter(this);
         }
-        public void OnAddFanPerButtonClicked()
+        public void OnAddFanRpmButtonClicked()
         {
             AddControl(Monitor.Monitor.sensorFan);
         }
@@ -62,7 +63,6 @@ namespace TemperatureMonitor.Presenter
                     {
                         Debug.WriteLine("WARN: duplicate '{0} and {1}' found. Skipping...", sensor.Name, sensor.Value);
                     }
-                    
                 }
                 c.UpdateData(data);
             }
