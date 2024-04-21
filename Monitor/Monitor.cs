@@ -1,89 +1,137 @@
 ﻿using LibreHardwareMonitor.Hardware;
+using System.Diagnostics;
 
 namespace TemperatureMonitor.Monitor
 {
-    public class Monitor
+    internal class Monitor
     {
-        private bool shoudRun = true;
-        private Dictionary<String, float> valueData;
+        //private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+
+        public const string sensorTemperature = "Temperature";
+        public const string sensorLoad = "Load";
+        public const string sensorFan = "Fan";
+        public const string sensorControl = "Control";
+
+        private readonly UpdateVisitor visitor;
+        private Thread? t;
+        //private List<ISensor> lastData;
+        private List<ISubscriber> subscribers;
+        private bool shouldRun = true;
+        private int sleepInterval = 100;
         public Monitor()
         {
-            this.valueData = new Dictionary<String, float>();
+            visitor = new UpdateVisitor();
+            t = new Thread(new ThreadStart(this.RunThread));
+            //lastData = [];
+            subscribers = [];
+        }
+        public Monitor(UpdateVisitor visitor, Thread t)
+        {
+            this.visitor = visitor;
+            this.t = t;
+            //lastData = [];
+            subscribers = [];
         }
 
-        public void doWork()
+        public void Start()
         {
-            while (shoudRun)
-            {
-
-            }
+            t.Start();
         }
 
-        public void stopWork()
+        public void Stop()
         {
-            shoudRun = false;
+            sleepInterval = 1;
+            shouldRun = false;
+            //t.Join();
+            //t = null;
         }
 
-        public Dictionary<String, float> updateSensors(bool includeMobo)
+        public void AddSubscriber(ISubscriber subscriber)
         {
-            Computer computer = new Computer
-            {
-                IsCpuEnabled = true,
-                IsGpuEnabled = true,
-                IsMemoryEnabled = false,
-                IsMotherboardEnabled = includeMobo,
-                IsControllerEnabled = false,
-                IsNetworkEnabled = false,
-                IsStorageEnabled = false
-            };
+            subscribers.Add(subscriber);
+        }
 
+        public void RemoveSubscriber(ISubscriber subscriber) {
+            subscribers.Remove(subscriber);
+        }
+        public List<ISensor> GetReadings()
+        {
+            return LoopAll();
+        }
+
+        private List<ISensor> LoopAll()
+        {
+            Computer computer = getDefaultComputer();
             computer.Open();
-            computer.Accept(new UpdateVisitor());
-            Dictionary<String, float> values = new Dictionary<String, float>();
+            computer.Accept(visitor);
+
+            List<ISensor> sensors = [];
             foreach (IHardware hardware in computer.Hardware)
             {
-                
-                //Console.WriteLine("Hardware: {0}", hardware.Name);
                 foreach (IHardware subhardware in hardware.SubHardware)
                 {
-                   //Console.WriteLine("\tSubhardware: {0}", subhardware.Name);
-
                     foreach (ISensor sensor in subhardware.Sensors)
                     {
-                        if (sensor.SensorType.ToString() != "Temperature")
-                        {
-                            continue;
-                        }
-                        values.Add(sensor.Name, sensor.Value ?? -1);
-                        //Console.WriteLine("\t\tSensor: {0}, value: {1}", sensor.Name, sensor.Value);
+                        sensors.Add(sensor);
                     }
                 }
-                
+
                 foreach (ISensor sensor in hardware.Sensors)
                 {
-                    //Console.WriteLine("\tSensor: {0}, value: {1}, type: {2}", sensor.Name, sensor.Value, sensor.SensorType);
-
-                    if (sensor.SensorType.ToString() != "Temperature")
-                    {
-                        continue;
-                    }
-
-                    if (sensor.Hardware.HardwareType.ToString() == "Cpu")
-                    {
-                        values.Add(sensor.Name, sensor.Value ?? -1);
-                        //Console.WriteLine("\tSensor: {0}, value: {1}, type: {2}", sensor.Name, sensor.Value, sensor.SensorType);
-
-                    }
-                    else if (sensor.Hardware.HardwareType.ToString() == "GpuNvidia" || sensor.Hardware.HardwareType.ToString() == "GpuAmd")
-                    {
-                        values.Add(sensor.Name, sensor.Value ?? -1);
-                        //Console.WriteLine("\tSensor: {0}, value: {1}, type: {2}", sensor.Name, sensor.Value, sensor.SensorType);
-                    }
+                    sensors.Add(sensor);
                 }
             }
 
             computer.Close();
-            return values;
+
+            return sensors;
+        }
+        private void RunThread()
+        {
+            while (shouldRun)
+            {
+                //Debug.WriteLine("Updating sensors...");
+                List<ISensor> data = LoopAll();
+                subscribers.ForEach(sub => {
+                    sub.OnDataUpdated(data);
+                });
+
+                for (int i = 0; i < 10; i++)
+                {
+                    Thread.Sleep(sleepInterval);
+                }
+            }
+        }
+        /*
+        public List<ISensor> GetAll()
+        {
+            semaphoreSlim.Wait();
+            try
+            {
+                return lastData;
+            }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
+        }
+        */
+        private Computer getDefaultComputer()
+        {
+
+            return new Computer
+            {
+                IsCpuEnabled = true,
+                IsGpuEnabled = true,
+                IsMotherboardEnabled = true,
+                //
+                IsMemoryEnabled = false,
+                IsControllerEnabled = false,
+                IsNetworkEnabled = false,
+                IsStorageEnabled = false,
+                IsPsuEnabled = false,
+                IsBatteryEnabled = false
+            };
         }
     }
 }
