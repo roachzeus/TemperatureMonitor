@@ -10,6 +10,7 @@ namespace TemperatureMonitor.Presenter
     {
         private IMainModel model;
         private IMainView view;
+        private TestForm? fanUI = null;
         public MainPresenter(IMainView view, IMainModel model)
         {
             this.view = view;
@@ -19,21 +20,21 @@ namespace TemperatureMonitor.Presenter
         }
         public void OnAddFanRpmButtonClicked()
         {
-            AddControl(Monitor.Monitor.sensorFan);
+            AddControl(Monitor.SnapMonitor.sensorFan);
         }
         public void OnAddFanCtrlButtonClicked()
         {
-            AddControl(Monitor.Monitor.sensorControl);
+            AddControl(Monitor.SnapMonitor.sensorControl);
         }
 
         public void OnAddLoadButtonClicked()
         {
-            AddControl(Monitor.Monitor.sensorLoad);
+            AddControl(Monitor.SnapMonitor.sensorLoad);
         }
 
         public void OnAddTempButtonClicked()
         {
-            AddControl(Monitor.Monitor.sensorTemperature);
+            AddControl(Monitor.SnapMonitor.sensorTemperature);
         }
 
         public void OnRemoveButtonClicked()
@@ -51,23 +52,22 @@ namespace TemperatureMonitor.Presenter
             }
         }
 
-        public void OnDataUpdated(Dictionary<string, List<ISensor>> sensorData)
+        public void OnFanUiButtonClicked()
+        {
+            if (fanUI == null || fanUI.IsDisposed)
+            {
+                fanUI = new(model.GetFanControls());
+                
+            }
+            fanUI.Show();
+        }
+        public void DataUpdated()
         {
             foreach (MonitorComponent c in view.GetMonitors())
             {
-                string type = c.GetComponentType();
-                Dictionary<string, float> data = [];
-                foreach (ISensor sensor in sensorData[type])
-                {
-                    if(!data.TryAdd(sensor.Name, sensor.Value ?? -1))
-                    {
-                        Debug.WriteLine("WARN: duplicate '{0} and {1}' found. Skipping...", sensor.Name, sensor.Value);
-                    }
-                }
-                c.UpdateData(data);
+                c.RefreshReading();
             }
         }
-
         public void StopMonitor()
         {
             model.StopMonitoring();
@@ -80,7 +80,10 @@ namespace TemperatureMonitor.Presenter
                 model.StartMonitoring();
             }
             MonitorComponent c = new MonitorComponent(type,
-                model.GetAvailableSensorsOfType(type));
+                //model.GetAvailableSensorsOfType(type)
+                new List<string>()
+                );
+            c.SetSensors(model.GetSensorsOfType(type));
             view.AddMonitor(c);
 
 

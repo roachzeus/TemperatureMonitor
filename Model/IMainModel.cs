@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LibreHardwareMonitor.Hardware;
+using TemperatureMonitor.Monitor;
 using TemperatureMonitor.Presenter;
 
 namespace TemperatureMonitor.Model
@@ -12,6 +9,7 @@ namespace TemperatureMonitor.Model
         public void SetPresenter(IMainPresenter presenter);
         public void StartMonitoring();
         public void StopMonitoring();
-        public List<string> GetAvailableSensorsOfType(string type);
+        public List<Sensor> GetSensorsOfType(string type);
+        public List<FanControlSensor> GetFanControls();
     }
 }

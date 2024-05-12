@@ -1,4 +1,5 @@
 ﻿using LibreHardwareMonitor.Hardware;
+using System.Diagnostics;
 
 namespace TemperatureMonitor.Monitor
 {
@@ -15,7 +16,7 @@ namespace TemperatureMonitor.Monitor
         }
         public void VisitSensor(ISensor sensor)
         {
-            Console.WriteLine(sensor.ToString());
+            Debug.WriteLine("Visited: " + sensor.Identifier.ToString());
         }
         public void VisitParameter(IParameter parameter) { }
     }

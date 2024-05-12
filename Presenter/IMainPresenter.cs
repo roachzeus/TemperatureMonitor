@@ -9,7 +9,9 @@ namespace TemperatureMonitor.Presenter
         public void OnAddFanCtrlButtonClicked();
         public void OnAddFanRpmButtonClicked();
         public void OnRemoveButtonClicked();
-        public void OnDataUpdated(Dictionary<string, List<ISensor>> sensorData);
         public void StopMonitor();
+        public void DataUpdated();
+
+        public void OnFanUiButtonClicked();
     }
 }

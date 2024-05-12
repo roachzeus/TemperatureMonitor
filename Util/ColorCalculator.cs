@@ -1,4 +1,4 @@
-﻿namespace TemperatureMonitor
+﻿namespace TemperatureMonitor.Util
 {
     public class ColorCalculator
     {

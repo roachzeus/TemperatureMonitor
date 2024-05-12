@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Windows.Forms;
+﻿using LibreHardwareMonitor.Hardware;
+using TemperatureMonitor.Monitor;
+using TemperatureMonitor.Util;
 
-namespace TemperatureMonitor
+namespace TemperatureMonitor.View
 {
-    // TODO should be internal class? and it's interface should be public?
     public class MonitorComponent : TableLayoutPanel
     {
+        // TODO should be internal class? and it's interface should be public?
         private readonly ColorCalculator colorCalculator;
 
         private readonly Label keyLbl;
@@ -14,6 +15,7 @@ namespace TemperatureMonitor
         private readonly CheckBox cb;
 
         private Dictionary<string, float> data;
+        private Dictionary<string, ISensor> sensors;
         private string type;
 
         public MonitorComponent(string type, List<string> items, ColorCalculator? colorCalculator = null)
@@ -24,33 +26,34 @@ namespace TemperatureMonitor
             valLbl = new Label();
             listBox = new ListBox();
             data = [];
+            sensors = new();
             this.type = type;
             InitControls("Select sensor", "N/A", items);
         }
-        
+
         private void InitControls(string key, string val, List<string> list)
         {
             //this.SuspendLayout();
-            this.Size = new Size(186, 400);
+            Size = new Size(186, 400);
             //this.Width = 500;
             //this.Height = 500;
-            this.MinimumSize = new Size(186, 400);
+            MinimumSize = new Size(186, 400);
             //this.AutoSize = true;
-            this.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            this.ColumnCount = 1;
-            this.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            ColumnCount = 1;
+            ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             //this.Location = new Point(5, 5);
-            this.Margin = new Padding(5);
-            this.Name = "monitorComponent";
-            this.RowCount = 4;
-            this.RowStyles.Add(new RowStyle(SizeType.Percent, 5F));
-            this.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            this.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            this.RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
+            Margin = new Padding(5);
+            Name = "monitorComponent";
+            RowCount = 4;
+            RowStyles.Add(new RowStyle(SizeType.Percent, 5F));
+            RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
+            RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
             //this.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
             //this.BorderStyle = BorderStyle.FixedSingle;
-            this.Visible = true;
-            this.TabIndex = 10;
+            Visible = true;
+            TabIndex = 10;
 
             // Checkbox
             cb.Anchor = AnchorStyles.Right;
@@ -100,19 +103,18 @@ namespace TemperatureMonitor
             listBox.Margin = new Padding(5);
             listBox.Name = "keys";
             listBox.TabIndex = 4;
-            listBox.SelectedValueChanged += selectedSensorChanged;
-            
+            listBox.SelectedValueChanged += delegate { SelectedSensorChanged(listBox, new EventArgs()); };
+
             //listBox.Size = new Size(200, 180);
             //listBox.MinimumSize = new Size(200, 180);
 
-            this.Controls.Add(cb);
-            this.Controls.Add(keyLbl);
-            this.Controls.Add(valLbl);
-            this.Controls.Add(listBox);
+            Controls.Add(cb);
+            Controls.Add(keyLbl);
+            Controls.Add(valLbl);
+            Controls.Add(listBox);
             //this.ResumeLayout(false);
             //this.PerformLayout();
         }
-
         public bool IsSelected()
         {
             return cb.Checked;
@@ -121,43 +123,85 @@ namespace TemperatureMonitor
         {
             return type;
         }
+        public void SetSensors(List<Sensor> sensorList)
+        {
+            //sensors.Clear();
+            //listBox.Items.Clear();
+            listBox.DataSource = sensorList;
+            /*
+            foreach (ISensor sensor in sensorList)
+            {
+                sensors.Add(sensor.Name, sensor);
+                listBox.Items.Add(sensor.Name);
+            }
+            */
+        }
         public void UpdateData(Dictionary<string, float> data)
         {
             this.data = data;
-            BeginInvoke(() => {
-                UpdateReading(listBox);
-            }); 
+            BeginInvoke(() =>
+            {
+                RefreshReadingPanel();
+            });
         }
-
-        private void selectedSensorChanged(object sender, EventArgs e)
+        public void RefreshReading()
         {
-            UpdateReading((ListBox)sender);
+            BeginInvoke(() =>
+            {
+                RefreshReadingPanel();
+            });
         }
+        private void RefreshReadingPanel()
+        {
+            if (listBox.SelectedItem is Sensor selected) //listBox.SelectedIndex != -1
+            {
+                keyLbl.Text = selected.GetName();
+                valLbl.Text = Math.Round(selected.GetValue(), 0).ToString();
+                valLbl.ForeColor = GetColor(selected.GetValue());
+            }
+            else
+            {
+                ShowErrorValues();
+            }
 
+        }
+        private void SelectedSensorChanged(object sender, EventArgs e)
+        {
+            //UpdateReading((ListBox)sender);
+            //RefreshReadingPanel((ListBox)sender);
+            RefreshReadingPanel();
+        }
         private void UpdateReading(ListBox box)
         {
             if (box != null && box.SelectedItem != null)
             {
                 string key = box.SelectedItem.ToString() ?? "null";
                 keyLbl.Text = key;
-                valLbl.Text = this.data.TryGetValue(key, out float value) ? Math.Round(value, 0).ToString() : "-1";
+                valLbl.Text = data.TryGetValue(key, out float value) ? Math.Round(value, 0).ToString() : "-1";
 
-                switch (type)
-                {
-                    case Monitor.Monitor.sensorTemperature:
-                        valLbl.ForeColor = colorCalculator.ComputeTemperatureColor(value);
-                        break;
-                    case Monitor.Monitor.sensorFan:
-                        valLbl.ForeColor = colorCalculator.ComputeFanSpeedColor(value);
-                        break;
-                    case Monitor.Monitor.sensorControl:
-                    case Monitor.Monitor.sensorLoad:
-                    default:
-                        valLbl.ForeColor = colorCalculator.ComputeLoadColor(value);
-                        break;
-                }
-                
+                valLbl.ForeColor = GetColor(value);
             }
+        }
+        private Color GetColor(float value)
+        {
+            switch (type)
+            {
+                case Monitor.SnapMonitor.sensorTemperature:
+                    return colorCalculator.ComputeTemperatureColor(value);
+                case Monitor.SnapMonitor.sensorFan:
+                    return colorCalculator.ComputeFanSpeedColor(value);
+                case Monitor.SnapMonitor.sensorControl:
+                case Monitor.SnapMonitor.sensorLoad:
+                default:
+                    return colorCalculator.ComputeLoadColor(value);
+            }
+        }
+        private void ShowErrorValues()
+        {
+            keyLbl.Text = "No selection";
+            valLbl.Text = "-1";
+            valLbl.ForeColor = colorCalculator.White();
         }
     }
 }
+

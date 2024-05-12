@@ -1,26 +1,21 @@
 ﻿using LibreHardwareMonitor.Hardware;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using TemperatureMonitor.Monitor;
 using TemperatureMonitor.Presenter;
 
 namespace TemperatureMonitor.Model
 {
-    internal class MainModel : IMainModel, ISubscriber
+    internal class MainModel : IMainModel, INotifySubscriber
     {
         private IMainPresenter? presenter; // set in presenter
-        private Monitor.Monitor monitor;
-
-        private Dictionary<string, List<string>> availableSensors;
+        //private Monitor.Monitor monitor;
+        private OpenMonitor monitor;
 
         public MainModel()
         {
-            monitor = new Monitor.Monitor();
+            //monitor = new Monitor.Monitor();
+            monitor = new OpenMonitor();
             monitor.AddSubscriber(this);
-            availableSensors = InitAvailableSensors();
         }
 
         public void StartMonitoring()
@@ -31,49 +26,33 @@ namespace TemperatureMonitor.Model
         {
             monitor.Stop();
         }
-        private Dictionary<string, List<string>> InitAvailableSensors()
+        public List<Sensor> GetSensorsOfType(string type)
         {
-            Dictionary<string, List<string>> ret = [];
-
-            foreach (ISensor sensor in monitor.GetReadings())
+            List<Sensor> list = new();
+            foreach (ISensor sensor in monitor.Get(type))
             {
-                string key = sensor.SensorType.ToString();
-                if (ret.TryGetValue(key, out List<string>? list))
+                list.Add(new Sensor(sensor));
+            }
+            return list;
+        }
+        public List<FanControlSensor> GetFanControls()
+        {
+            List<FanControlSensor> list = new();
+            foreach (ISensor sensor in monitor.Get(OpenMonitor.sensorControl))
+            {
+                try
                 {
-                    list.Add(sensor.Name);
-                }
-                else
+                    list.Add(new FanControlSensor(sensor));
+                } catch (TempMonitorException e)
                 {
-                    List<string> newList = [];
-                    newList.Add(sensor.Name);
-                    ret.Add(key, newList);
+                    Debug.WriteLine("Failed to create FanControlSensor: {0}", e.Message);
                 }
             }
-
-            return ret;
+            return list;
         }
-        public List<string> GetAvailableSensorsOfType(string type)
+        public void DataUpdated()
         {
-            return availableSensors.TryGetValue(type, out List<string>? list) ? list : [];
-        }
-        public void OnDataUpdated(List<ISensor> sensorData)
-        {
-            Dictionary<string, List<ISensor>> grouped = [];
-            foreach (ISensor sensor in sensorData)
-            {
-                string key = sensor.SensorType.ToString();
-                if (grouped.TryGetValue(key, out List<ISensor>? list))
-                {
-                    list.Add(sensor);
-                }
-                else
-                {
-                    List<ISensor> newList = [];
-                    newList.Add(sensor);
-                    grouped.Add(key, newList);
-                }
-            }
-            presenter.OnDataUpdated(grouped);
+            presenter.DataUpdated();
         }
         public void SetPresenter(IMainPresenter presenter)
         {

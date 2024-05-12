@@ -40,6 +40,7 @@ namespace TemperatureMonitor.View
             btnAddFanCtrl = new Button();
             btnAddFanRpm = new Button();
             btnRem = new Button();
+            btnFanUI = new Button();
             flp.SuspendLayout();
             SuspendLayout();
             // 
@@ -50,6 +51,7 @@ namespace TemperatureMonitor.View
             flp.Controls.Add(btnAddLoad);
             flp.Controls.Add(btnAddFanCtrl);
             flp.Controls.Add(btnAddFanRpm);
+            flp.Controls.Add(btnFanUI);
             flp.Controls.Add(btnRem);
             flp.Location = new Point(10, 10);
             flp.Margin = new Padding(5);
@@ -119,7 +121,7 @@ namespace TemperatureMonitor.View
             btnRem.BackColor = Color.FromArgb(64, 64, 64);
             flp.SetFlowBreak(btnRem, true);
             btnRem.ForeColor = Color.Silver;
-            btnRem.Location = new Point(5, 38);
+            btnRem.Location = new Point(105, 38);
             btnRem.Margin = new Padding(5);
             btnRem.Name = "btnRem";
             btnRem.Size = new Size(90, 23);
@@ -127,6 +129,20 @@ namespace TemperatureMonitor.View
             btnRem.Text = "Remove";
             btnRem.UseVisualStyleBackColor = false;
             btnRem.Click += btnRem_Click;
+            // 
+            // btnFanUI
+            // 
+            btnFanUI.Anchor = AnchorStyles.Left;
+            btnFanUI.BackColor = Color.FromArgb(64, 64, 64);
+            btnFanUI.ForeColor = Color.Silver;
+            btnFanUI.Location = new Point(5, 38);
+            btnFanUI.Margin = new Padding(5);
+            btnFanUI.Name = "btnFanUI";
+            btnFanUI.Size = new Size(90, 23);
+            btnFanUI.TabIndex = 5;
+            btnFanUI.Text = "FanUI";
+            btnFanUI.UseVisualStyleBackColor = false;
+            btnFanUI.Click += btnFanUI_Click;
             // 
             // MainUI
             // 
@@ -139,7 +155,6 @@ namespace TemperatureMonitor.View
             Name = "MainUI";
             Padding = new Padding(5);
             Text = "TempMonitor";
-            //SizeChanged += mainUI_Resize;
             flp.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -152,5 +167,6 @@ namespace TemperatureMonitor.View
         private Button btnAddFanCtrl;
         private Button btnAddLoad;
         private Button btnAddFanRpm;
+        private Button btnFanUI;
     }
 }
